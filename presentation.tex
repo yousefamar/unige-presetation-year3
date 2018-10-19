@@ -1,0 +1,341 @@
+\documentclass[aspectratio=169]{beamer}
+\mode<presentation>
+
+\hypersetup{pdfpagemode=FullScreen}
+\useoutertheme[subsection=false]{smoothbars}
+
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows.meta}
+\usepackage{listings}
+\graphicspath{{figs/}}
+
+\colorlet{punct}{red!60!black}
+\definecolor{delim}{RGB}{20,105,176}
+
+\lstdefinelanguage{json}{%
+	basicstyle=\scriptsize\ttfamily,
+	showstringspaces=false,
+	breaklines=true,
+	literate=
+		*{:}{{{\color{punct}{:}}}}{1}
+		{,}{{{\color{punct}{,}}}}{1}
+		{\{}{{{\color{delim}{\{}}}}{1}
+		{\}}{{{\color{delim}{\}}}}}{1}
+		{[}{{{\color{delim}{[}}}}{1}
+		{]}{{{\color{delim}{]}}}}{1}
+}
+
+\lstdefinelanguage{dockerfile}{%
+	basicstyle=\ttfamily,
+	showstringspaces=false,
+	breaklines=true
+}
+\lstset{language=dockerfile}
+
+\lstdefinelanguage{caveats}{%
+	basicstyle=\scriptsize\ttfamily,
+	showstringspaces=false,
+	breaklines=true
+}
+
+\tikzset{%
+	arrow/.style={%
+		draw,
+		fill=structure.fg,
+		single arrow,
+		minimum width=5ex,
+		minimum height=10ex,
+		single arrow head extend=1ex
+	}
+}
+\newcommand{\arrow}{%
+\tikz [baseline=-0.5ex]{\node [arrow] {};}
+}
+
+\title{\Huge Privacy-Aware Load Balancing for Distributed Computation}
+\author{\Large Yousef Amar\\%
+\small QMUL Supervisor: Gareth Tyson\\%
+UniGe Supervisor: Lucio Marcenaro\\%
+Starting Date: 2016-01-16%
+}
+\date{}
+\setbeamertemplate{navigation symbols}{}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+	\frametitle{Previous Work}
+	\begin{itemize}
+		\item Privacy-Aware Access Control
+		\item Load Balancing on the Network Edge
+	\end{itemize}
+	\includegraphics[width=\linewidth]{big-picture-plus}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Research Context}
+	\begin{columns}[c]
+
+		\column{.5\textwidth}
+		\begin{itemize}
+			\item Data sources at the edge and in the cloud
+			\begin{itemize}
+				\item IoT devices
+				\item Smart phones
+				\item Social media
+			\end{itemize}
+			\item Computation shifting towards the edge
+			\begin{itemize}
+				\item Untapped processing power
+				\item Near sources, low latency
+				\item An increase in privacy
+			\end{itemize}
+		\end{itemize}
+
+		\column{.5\textwidth}
+		\includegraphics[width=\linewidth]{context}
+
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Research Context}
+	\includegraphics[width=\linewidth]{multiplicity}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Research Problem}
+	\begin{itemize}
+		\item Which host should execute a given function?
+		\item Minimising factors such as
+		\begin{itemize}
+			\item Latency
+			\item Information disclosure
+			\item Cost (e.g.\ power consumption, bandwidth usage)
+			\item Device capabilities
+			\item Other
+		\end{itemize}
+		\item Tradeoff between these factors
+		\item A system for tracking these factors and controlling job distribution
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Related Work}
+	\begin{itemize}
+		\item SOTA Load Balancing applicable to this context:
+		\begin{itemize}
+			\item Beamer (NSDI 2018)
+			\item Maglev (NSDI 2016)
+		\end{itemize}
+		\item Lots of research in privacy and information disclosure
+		\item \emph{None} combining the load balancing with privacy
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Requirements and Constraints}
+	\begin{itemize}
+		\item A system that distributes computation in a way that minimises response time, within the bounds of privacy constraints imposed by the user
+		\item Overhead must be small enough for execution on edge and home IoT devices
+		\item System must be versatile enough to run on a range of edge devices
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Design}
+	\framesubtitle{Architechture --- Symbols}
+	\begin{columns}[c]
+		\column{.5\textwidth}
+		\includegraphics[width=\linewidth]{symbols}
+		\column{.5\textwidth}
+		\includegraphics[width=\linewidth]{privapprox}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{No sources, no cross-host comms}
+	\includegraphics[width=\linewidth]{method1}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Single-source, no cross-host comms, no linkage}
+	\includegraphics[width=\linewidth]{method2a}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Single-source, no cross-host comms, no linkage}
+	\includegraphics[width=\linewidth]{method2b}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Single-source, cross-source comms, host whitelist}
+	\includegraphics[width=\linewidth]{method3}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Private sources allow larger whitelists}
+	\includegraphics[width=\linewidth]{method4}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Multi-source, cross-host sources}
+	\includegraphics[width=\linewidth]{method5}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Whitelist Generation}
+	\begin{itemize}
+		\item User, community, and/or app provider list inferences for individual and combinations of data source access
+		\item System lists risks vs utility, and user decides which risks are acceptable for the utlity they require
+		\item System selects a subset of hosts that would satisfy these constraints
+		\item From the system-side, classes of jobs simply have a subset of hosts available to execute on
+		\item Problem reduces to whitelist generation on top of load balancing
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Architechture -- Job, data, and metadata pipelines}
+	\centering
+	\includegraphics[width=0.6\linewidth]{arch-new}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Load Balancing -- Optimising for Performance}
+	\centering
+	\includegraphics[width=0.7\columnwidth]{service}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Method}
+	\framesubtitle{Load Balancing -- Optimising for Performance}
+	\begin{columns}[c]
+		\column{.6\textwidth}
+		Message response times with different partitioning strategies as Tukey Box-Whisker plots. Whiskers show 1.5$\times$ inter-quartile range above (respectively below) the third (respectively first) quartile, whereas red diamonds show the mean values.
+		\column{.4\textwidth}
+		\includegraphics[width=\columnwidth]{kafka-violins}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Privacy Heuristics}
+	\includegraphics[width=0.48\linewidth]{metrics-surprisal}
+	\includegraphics[width=0.5\linewidth]{metrics-autocorrelation}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Past Evaluation}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.49\columnwidth]{redd-roc-utility-interesting-bit}
+		\includegraphics[width=0.49\columnwidth]{redd-roc-attack-interesting-bit}
+		\caption{Receiver Operating Characteristic (ROC) curves for washer-dryer (utility; left) and microwave (attack; right)}\label{fig:redd-roc-interesting-bit}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Past Evaluation}
+	\begin{columns}[c]
+
+		\column{.45\textwidth}
+		\begin{itemize}
+			\item Gains in privacy
+			\item Without impacting utility
+			\item Negligible latency overhead
+			\item Showing that the overhead on IoT devices is justifiable
+		\end{itemize}
+
+		\column{.55\textwidth}
+		\begin{figure}
+			\centering
+			\includegraphics[width=\columnwidth]{violin}
+			\caption{Distributions of time to availability under different conditions}\label{fig:violin}
+		\end{figure}
+
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Theis ToC}
+	\begin{itemize}
+		\item Chapter 1: Privacy Measures
+		\item Chapter 2: Privacy-Aware Access Control
+		\item Chapter 3: Edge Load Balancing
+		\item Chapter 4: Privacy-Aware Edge Load Balancing
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Publications}
+	\footnotesize
+	\begin{itemize}
+		\item 2018 -- Providing Occupancy as a Service with Databox \textit{In Proceedings of the 1st ACM International Workshop on Smart Cities and Fog Computing} (pp.\ 29-34) ACM
+		\item 2018 -- An Information-Theoretic Approach to Time-Series Data Privacy \textit{In Proceedings of the 1st Workshop on Privacy by Design in Distributed Systems} (p. 3) ACM
+		\item 2018 -- Building accountability into the Internet of Things: the IoT Databox model \textit{Journal of Reliable Intelligent Environments} (pp.\ 1-17) Springer
+		\item 2017 -- Balanced Message Distribution in Distributed Message Handling Systems \textit{US Patent (serial number: 15/794440)}
+		\item 2017 -- Route-based authorization and discovery for personal data \textit{In the 11th EuroSys Doctoral Workshop}
+		\item 2016 -- Personal Data Management with the Databox: What's Inside the Box? \textit{In Proceedings of the 2016 ACM Workshop on Cloud-Assisted Networking} (pp.\ 49-54) ACM
+		\item 2016 -- Privacy-aware infrastructure for managing personal data \textit{In Proceedings of the 2016 ACM SIGCOMM Conference} (pp.\ 571-572) ACM
+		\item 2015 -- Incremental dense multi-modal 3d scene reconstruction. \textit{In Intelligent Robots and Systems (IROS), 2015 IEEE/RSJ International Conference on} (pp.\ 908-915) IEEE
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Conference and Workshop Attendance}
+	\begin{itemize}
+		\item W-P2DS 2018 (presenting)
+		\item EuroDW 2018 (presenting)
+		\item Databox Annual Symposium (presenting)
+		\item EuroDW 2017
+		\item EuroSys 2017
+		\item SIGCOMM 2016
+		\item NGN-MSN Coseners 2016
+		\item UK HDAN Research Roadmap Workshop
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Awards and Scientific Recognition}
+	\begin{itemize}
+		\item EuroSys 2018 Conference Grant
+		\item EuroSys 2018 Shadow PC Grant
+		\item EuroSys 2017 Grant
+		\item IEEE Circuit Building Competition Winner
+		\item SIGCOMM 2016 Grant
+		\item \texttt{yousefamar.com\#awards}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Miscellaneous}
+	\begin{itemize}
+		\item amar.io/skills-points-record.png
+		\item Involvement in Databox Project databoxproject.uk
+		\item Internship at Nokia Bell Labs Stuttgart
+		\item Time at UniGe and areas of overlap
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain,c]
+	\begin{center}
+		\usebeamerfont*{frametitle}
+		\usebeamercolor[fg]{frametitle}
+		\ \\[2em]
+		\Huge Thank you for your attention!\\[1em]
+	\end{center}
+\end{frame}
+
+\end{document}
